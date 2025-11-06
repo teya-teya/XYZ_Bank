@@ -12,6 +12,7 @@ import pages.NavigationButtonsComponent;
 import utils.RandomUtils;
 
 import static enums.UrlConstants.MANAGER;
+import static io.qameta.allure.Allure.step;
 
 public class AddCustomerTest extends BaseTest {
     WebChecks webChecks;
@@ -47,5 +48,7 @@ public class AddCustomerTest extends BaseTest {
         navBtns.clickBtnCenter("Customers");
 
         webChecks.checkElementContainsText(customersPage.tableCustomers, "Таблица клиентов", firstName);
+
+        step("Постусловие", () -> customersPage.deleteCustomerByName(firstName));
     }
 }
