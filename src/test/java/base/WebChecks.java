@@ -9,6 +9,11 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import utils.WaitHelper;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+
 public class WebChecks {
     public WebDriver driver;
     public WebDriverWait wait;
@@ -43,4 +48,54 @@ public class WebChecks {
                         "Ожидалось, что будет содержать: '" + expectedText + "', но было: '" + actualText + "'"
         );
     }
+
+    @Step("Проверяем, что элемент {nameElement} не содержит текст '{unexpectedText}'")
+    public void checkElementNotContainsText(WebElement element, String nameElement, String unexpectedText) {
+        WaitHelper.waitForVisible(wait, element);
+
+        String actualText = element.getText().trim();
+
+        Assertions.assertFalse(
+                actualText.contains(unexpectedText),
+                "Текст элемента " + nameElement + " содержит запрещённый текст: '"
+                        + unexpectedText + "'. Фактический текст: '" + actualText + "'"
+        );
+    }
+
+    public enum SortOrder {
+        ASC,
+        DESC
+    }
+    @Step("Проверяем, что колонка '{columnName}' отсортирована в порядке: {order}")
+    public WebChecks checkColumnSorted(List<WebElement> elements, String columnName, SortOrder order) {
+
+        List<String> values = elements.stream()
+                .map(cell -> cell.getText().trim())
+                .toList();
+
+        List<String> sorted = new ArrayList<>(values);
+
+        if (order == SortOrder.ASC) {
+            sorted.sort(String::compareToIgnoreCase);
+        } else {
+            sorted.sort(Collections.reverseOrder(String.CASE_INSENSITIVE_ORDER));
+        }
+
+        Assertions.assertEquals(values, sorted,
+                "Колонка '" + columnName + "' должна быть отсортирована в порядке: " + order);
+        return this;
+    }
+
+    @Step("Проверяем, что строки после сортировки содержат те же элементы (по уникальному содержимому строки)")
+    public void checkRowsContentSame(List<String> beforeSort, List<WebElement> rows) {
+
+        List<String> afterSort = rows.stream()
+                .map(row -> row.getText().trim())
+                .toList();
+
+        Assertions.assertEquals(new HashSet<>(beforeSort), new HashSet<>(afterSort),
+                "После сортировки содержимое строк таблицы изменилось!");
+    }
+
+
 }

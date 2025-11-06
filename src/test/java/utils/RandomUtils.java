@@ -14,6 +14,11 @@ public class RandomUtils {
         return faker.number().digits(10);
     }
 
+    /**
+     *
+     * @param code набор цифр
+     * @return имя, сгенерированное из пар цифр кода
+     */
     public static String generateFirstNameFromDigits(String code) {
         StringBuilder result = new StringBuilder();
 
